@@ -5,18 +5,24 @@ A custom Polymer element for adding tags from a list of values.
 # Usage
 
 Import it:
-
-	<link rel="import" href="yummy-tags.html">
-
+	
+```html
+<link rel="import" href="yummy-tags.html">
+```
+	
 Define your data:
 
-	<script>
-		window.codeLangs = ['ActionScript', 'C', 'C#', 'C++', 'Clojure', '...'];
-	</script>
+```html
+<script>
+	window.codeLangs = ['ActionScript', 'C', 'C#', 'C++', 'Clojure', '...'];
+</script>
+```
 
 Use it:
 
-	<yummy-tags globalValues="codeLangs"></yummy>
+```html
+<yummy-tags globalValues="codeLangs"></yummy>
+```
 
 # Features
 
