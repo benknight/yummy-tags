@@ -21,7 +21,7 @@ Define your data:
 Use it:
 
 ```html
-<yummy-tags globalValues="codeLangs"></yummy>
+<yummy-tags globalValues="codeLangs"></yummy-tags>
 ```
 
 # Features
