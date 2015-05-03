@@ -1,0 +1,167 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../core-selector/core-selector.html">
+
+<polymer-element name="yummy-tags" attributes="value globalValues">
+	<template>
+		<link rel="stylesheet" href="yummy-tags.css">
+		<ul id="selected" class="selected">
+			<template repeat="{{$.selector.selected}}">
+				<li class="selected__item">
+					{{}}
+					<button on-click="{{toggleItemAction}}" title="{{}}">remove</button>
+				</li>
+			</template>
+		</ul>
+		<div class="add-item">
+			<input type="text" id="input" on-keyup="{{keyUpAction}}" on-keydown="{{keyDownAction}}" on-focus="{{focusAction}}" on-blur="{{blurAction}}" autocomplete="off" placeholder="New item">
+			<ul hidden class="choices" id="choices" on-mouseover="{{mouseOverAction}}" on-mouseout="{{mouseOutAction}}">
+				<div hidden?="{{filteredItems.length > 0}}">
+					No matches found.
+				</div>
+				<template repeat="{{filteredItems}}">
+					<li class="choices__item" title="{{}}">{{}}</li>
+				</template>
+			</ul>
+		</div>
+		<core-selector multi id="selector" target="{{$.choices}}" valueattr="title" on-core-select="{{selectAction}}" selected="{{value}}" excludedLocalNames="div"></core-selector>
+	</template>
+	<script>
+		(function () {
+			Polymer('yummy-tags', {
+				// a list of filtered choices based on input value
+				filteredItems: null,
+
+				// keep track of the user's focus in the choice list
+				cursor: 0,
+
+				ready: function () {
+					this.items = this.globalValues ? window[this.globalValues] : [];
+					this.filteredItems = this.items;
+				},
+
+				filterItems: function () {
+					var inputValue = this.$.input.value;
+					this.filteredItems = this.items.filter(function (item) {
+						if (! inputValue) {
+							return item;
+						} else {
+							return item.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1;
+						}
+					});
+					this.async(function () {
+						this.setCursor(0);
+					});
+				},
+
+				setCursor: function (index) {
+					var choiceNodes, currentNode, nextNode;
+					index = Math.min(Math.max(0, index), this.filteredItems.length - 1);
+					choiceNodes = this.$.choices.querySelectorAll('li');
+					if (currentNode = this.$.choices.querySelector('.choices__item--cursor')) {
+						currentNode.classList.remove('choices__item--cursor');
+					}
+					if (nextNode = choiceNodes.item(index)) {
+						nextNode.classList.add('choices__item--cursor');
+					}
+					this.cursor = index;
+				},
+
+				_getKeyCode: function (event) {
+					return (_ref = event.which) != null ? _ref : event.keyCode;
+				},
+
+				keyUpAction: function (event) {
+					var stroke = this._getKeyCode(event);
+					switch (stroke) {
+						case 37: // left
+						case 38: // up
+						case 39: // right
+						case 40: // down
+							break;
+						default:
+							this.filterItems();
+					}
+				},
+
+				keyDownAction: function (event) {
+					var stroke = this._getKeyCode(event);
+					switch (stroke) {
+						case 38: // up
+							this.setCursor(this.cursor - 1);
+							break;
+						case 40: // down
+							this.setCursor(this.cursor + 1);
+							break;
+						case 37: // left
+						case 39: // right
+							break;
+						case 8: // backspace
+							if (! this.$.input.value) {
+								this.$.selector.selected.pop();
+							}
+							break;
+						case 27: // escape
+							this.$.input.blur();
+							this.$.choices.hidden = true;
+							break;
+						case 13: // enter
+							if (this.$.selector.selected) {
+								this.$.selector.addRemoveSelected(this.filteredItems[this.cursor]);
+							} else {
+								this.$.selector.selected = [this.filteredItems[this.cursor]];
+							}
+							this.$.input.value = '';
+							break;
+					}
+				},
+
+				toggleItemAction: function (event, details, sender) {
+					this.$.selector.addRemoveSelected(sender.title);
+				},
+
+				selectAction: function (event, details) {
+					this.$.input.blur();
+					this.async(function () {
+						this.$.input.focus();
+					});
+					// XXX(2015-01-16):
+					// For some reason this is necessary for the data bindings to update.
+					// I have no idea why. Probably a bug in the source.
+					// `slice(0)` clones the array.
+					this.value = this.value.slice(0);
+				},
+
+				_focusAfterKeyDown: function (event) {
+					if (this._getKeyCode(event) === 8) {
+						return;
+					}
+					this.$.choices.hidden = false;
+					this.setCursor(0);
+					this.removeEventListener('keydown', this._focusAfterKeyDown);
+				},
+
+				focusAction: function () {
+					this.addEventListener('keydown', this._focusAfterKeyDown);
+				},
+
+				blurAction: function () {
+					if (! this.$.choices.hovered) {
+						this.$.choices.hidden = true;
+					}
+				},
+
+				mouseOverAction: function (event) {
+					this.$.choices.hovered = true;
+					if (event.target.tagName == 'LI') {
+						var choiceNodes = Array.prototype.slice.call(this.$.choices.querySelectorAll('li'));
+						this.setCursor(choiceNodes.indexOf(event.target));
+					}
+				},
+
+				mouseOutAction: function () {
+					this.$.choices.hovered = false;
+				}
+			});
+		})();
+	</script>
+</polymer-element>

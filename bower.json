@@ -1,0 +1,26 @@
+{
+  "name": "polymer-tags-element",
+  "version": "1.0",
+  "authors": [
+    "Benjamin Knight <ben@benknight.me>"
+  ],
+  "description": "A custom Polymer element for creating a tags user interface from a list of values.",
+  "main": "tags.html",
+  "keywords": [
+    "polymer",
+    "selection",
+    "tags"
+  ],
+  "license": "MIT",
+  "homepage": "http://benknight.github.io/polymer-tags-select",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "core-selector": "Polymer/core-selector#~0.5.5"
+  }
+}
