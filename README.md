@@ -21,4 +21,4 @@ Use it:
 # Features
 
 * Autocomplete
-* Behaves like an input field with support for backspace, arrow keys, enter, etc.  Similar to (Select2)[https://select2.github.io/examples.html].
+* Behaves like an input field with support for backspace, arrow keys, enter, etc.  Similar to [jQuery Select2](https://select2.github.io/examples.html).
